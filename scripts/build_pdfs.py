@@ -202,7 +202,6 @@ def build_top100(entries: list[dict]) -> Path:
     top = entries[:100]
     body = [cover_html("TOP 100", "Os 100 jogos melhor posicionados para virar instrumento de pesquisa em dilemas sociais.", "RANKING COMPLETO", len(entries))]
     body.append(toc_html(top, "TOP 100 — RANKING"))
-    body.append('<h1 class="section new-page">Ranking · #1–#100</h1>')
     for i, e in enumerate(top, 1):
         body.append(game_card(i, e, big=(i <= 10)))
     return emit_html(body, "TOP100.html")
@@ -212,7 +211,6 @@ def build_top25(entries: list[dict]) -> Path:
     top = entries[:25]
     body = [cover_html("TOP 25", "Pré-seleção final: 25 candidatos para análise profunda.", "FINALISTAS", len(entries))]
     body.append(toc_html(top, "TOP 25 — FINALISTAS"))
-    body.append('<h1 class="section new-page">Finalistas · #1–#25</h1>')
     for i, e in enumerate(top, 1):
         body.append(game_card(i, e, big=True))
     return emit_html(body, "TOP25.html")
@@ -245,9 +243,9 @@ def build_finalistas(entries: list[dict]) -> Path:
 
     body = [cover_html("FINALISTAS", "Análise profunda dos 25 jogos mais promissores. Plano concreto de modificação, mapeamento de dilemas, trade-offs e próximas ações.", "ANÁLISE EDITORIAL", len(entries))]
 
-    # Preâmbulo como intro
+    # Preâmbulo + TOC juntos, sem page-break forçado entre eles
     preamble_html = markdown.markdown(preambulo, extensions=["tables", "fenced_code"])
-    body.append(f'<div class="closing">{preamble_html}</div>')
+    body.append(f'<div class="report-intro">{preamble_html}</div>')
 
     body.append(toc_html(top, "25 FINALISTAS"))
 
