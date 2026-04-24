@@ -638,6 +638,10 @@ escore máximo).
   filtros e Y é o total do catálogo (1202). Inicialmente X=400 (limite
   de renderização para não travar o browser) mas o contador textual
   sinaliza se há mais resultados disponíveis abaixo do limite.
+  **Quando o filtro muda, o contador pulsa em amarelo-claro por 350 ms**
+  — dá feedback visual imediato de que a lista à direita foi
+  recalculada, resolvendo a ambiguidade "o slider está só acompanhando
+  ou já filtrou?".
 
 - **[2] Busca textual** — campo `<input type="search">` com placeholder
   "nome, gênero, engine…". Faz match case-insensitive nos campos
@@ -683,32 +687,48 @@ sticky no desktop (acompanha o scroll) e colapsa no topo em viewports
 
 ### 7.3 Estrutura do card
 
-![Figura 3 — Card individual de jogo](file:///home/grec/Documentos/psyfun-jogos-research/exports/screenshots/03_card.png)
+![Figura 3 — Card individual com todas as camadas visíveis](file:///home/grec/Documentos/psyfun-jogos-research/exports/screenshots/03_card.png)
 
 **Figura 3 — Card individual.** A unidade visual do grid. Cada card
-transmite cinco camadas de informação em <200 px de altura.
+transmite oito camadas de informação em densidade controlada.
 
-- **[1] Rank implícito** — a ordem no grid corresponde à ordem por score
-  descendente. Não há número visível, mas o topo da tela sempre contém
-  os melhores.
+- **[1] Cover image** — aspect ratio 16:9. Puxa a primeira imagem de
+  `images/<id>/`. Se não houver, renderiza cinza com texto "sem imagem".
 
 - **[2] Score badge** — retângulo laranja (`#ff9f43`) no canto superior
-  direito do cover. Mostra o score composto com duas casas decimais.
-  Cor única no card para chamar atenção imediata.
+  direito do cover. Score composto com 1 casa decimal. Tooltip explica
+  a fórmula.
 
-- **[3] Nome + meta** — nome do jogo em bold + linha compacta de meta
-  (gênero · engine · plataforma). Truncado via CSS se longo demais.
+- **[3] Badges de plataforma** — canto inferior esquerdo do cover.
+  Cada plataforma do campo `plataforma` vira um quadrado colorido
+  conforme convenção: `WEB` azul escuro, `WIN` azul Windows, `MAC`
+  cinza, `LIN` preto-laranja, `AND` verde Android, `iOS` cinza claro,
+  `SW` vermelho Switch, `PS` azul PlayStation, `XB` verde Xbox,
+  `VR` roxo, `ALL` laranja (cross-platform). Hover mostra nome
+  completo da plataforma ("Android", "Nintendo Switch").
 
-- **[4] Chips de dilemas compatíveis** — badges azuis com as siglas dos
-  dilemas (PD, PG, SH, UG, DG, SD, TG, CG, CPG, BG) que o jogo suporta
-  via modificação. Permite comparação visual rápida entre cards.
+- **[4] Título do jogo + subtitle** — nome em bold + linha compacta
+  (gênero · engine). Truncado via CSS se longo demais.
 
-- **[5] Linha de estatísticas** — texto monospace
-  `ader X · dif X · viab X · esf X`. Condensado para caber na altura
-  limitada. Hover eventual pode expandir tooltip.
+- **[5] Descrição curta** — parágrafo em 2 linhas com ellipsis. Puxa
+  do `exemplo_concreto` (descreve a *modificação*) ou do `observacoes`
+  ou do `raciocinio_dificuldade` como fallback. Dá contexto imediato
+  sem precisar abrir o modal.
 
-- **[6] Botão "ver detalhes"** — rodapé do card, abre o modal descrito
-  na Figura 4. Preserva a navegação sem sair da página.
+- **[6] Chips de dilemas compatíveis** — siglas (PD, PG, SH, UG, DG, SD,
+  TG, CG, CPG, BG) em monospace azul. Hover em cada chip revela o nome
+  completo do dilema.
+
+- **[7] Linha de estatísticas** — texto monospace
+  `ader X · dif X · viab X · esf X` com cada número em cor de destaque.
+  Tooltips individuais explicam cada métrica.
+
+- **[8] Footer clicável** — faixa final "clique ou pressione Enter para
+  abrir detalhes →" em laranja discreto. **O card inteiro é clicável**
+  (tem `role="button"` e `tabindex="0"`), e aceita teclado (Enter ou
+  espaço), com focus-ring laranja para acessibilidade. Não é só o
+  footer — qualquer parte do card abre o modal. O footer serve de
+  indicação visual explícita dessa interação.
 
 ### 7.4 Modal de detalhes
 
@@ -767,8 +787,52 @@ layout single-column.
 
 - **[2] Grid single-column** — cards aparecem um abaixo do outro,
   preservando toda a informação (cover, badge, nome, dilemas, stats,
-  botão). A usabilidade mobile é intencional: o pesquisador pode
+  footer). A usabilidade mobile é intencional: o pesquisador pode
   filtrar enquanto espera em filas ou comuta.
+
+### 7.7 Notas sobre o iteração UX (v2)
+
+A versão inicial do dashboard passou por uma rodada de feedback e cinco
+melhorias foram aplicadas em uma segunda iteração:
+
+1. **Onde cada jogo roda, visível no card.** Antes: plataforma aparecia
+   só em texto corrido ("windows|mac|linux|web") no subtitle. Agora:
+   **badges coloridos no cover** (elemento [3] da Figura 3) —
+   reconhecimento imediato, sem ler.
+
+2. **Descrição curta no card.** Antes: só via modal. Agora: **2 linhas
+   com ellipsis** abaixo do subtitle (elemento [5]) — permite triagem
+   visual de dezenas de candidatos sem abrir modais em sequência.
+
+3. **Tooltips nativos em todos os controles.** Antes: labels secos como
+   "Aderência ≥", "Risco ToS ≤" — quem não leu a documentação não
+   sabia o que cada métrica significa. Agora: **atributo `title` em
+   cada h3, slider, select e toggle** — hover no desktop mostra a
+   explicação do browser. Cada `<h3>` da sidebar também ganhou um
+   **ícone (i)** ao lado, com tooltip detalhado do grupo de filtros.
+
+4. **Feedback visual de filtro.** Antes: o pesquisador ajustava um
+   slider e tinha que olhar pra direita pra confirmar que algo mudou.
+   Agora: **contador pulsa em amarelo-claro** por 350 ms sempre que o
+   número filtrado muda, e os novos cards fazem **fade-in** (animação
+   `translateY(4px)` + `opacity: 0→1` em 250 ms). Dois canais de
+   feedback, sem latência perceptível (reaplicação tipicamente < 30 ms).
+
+5. **Card inteiro clicável + suporte a teclado.** Antes: só o botão
+   "ver detalhes →" abria o modal — pequeno, discreto, fácil de
+   perder. Agora: **o `<div>.card` tem `role="button"`, `tabindex="0"`,
+   `cursor: pointer`** e listener de `click` + `keydown` para Enter e
+   Espaço. Um *focus-ring* laranja aparece quando navegado por Tab.
+   O footer "clique ou pressione Enter para abrir detalhes →" serve
+   de **indicação visual explícita** que a totalidade do card é
+   interativa — não um botão isolado.
+
+Estas melhorias não mudam o volume de código significativamente
+(+~120 linhas no JS/CSS do `build_dashboard.py`) mas mudam a percepção
+de qualidade do produto de maneira não-marginal. O princípio: **cada
+elemento visual deve ter três camadas — identidade visual (cor/ícone
+imediato), tooltip explicativo (para quem quer mais), semântica
+acessível (role/aria/keyboard)**.
 
 ### 7.7 Performance
 
