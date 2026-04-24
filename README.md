@@ -31,7 +31,8 @@ Vocabulário controlado completo em [meta/VOCABULARIO.md](meta/VOCABULARIO.md).
 public/              # servido pelo Vercel (catalogopsyfun.vercel.app)
 ├── index.html       # dashboard facetado (filtros, busca, galeria)
 ├── images/          # ~1310 imagens de ~680 jogos
-├── pdfs/            # TOP100.pdf, TOP25.pdf, FINALISTAS.pdf (estilo revista)
+├── pdfs/            # TOP100.pdf, TOP25.pdf, FINALISTAS.pdf, RELATORIO.pdf
+├── screenshots/     # 6 screenshots anotadas (usadas no RELATORIO.pdf)
 └── data/            # CATALOGO.csv + CONSOLIDADO.jsonl (fonte canônica)
 
 meta/                # documentos explicativos e análises
@@ -40,7 +41,8 @@ meta/                # documentos explicativos e análises
 ├── SPEC_AGENTE.md   # briefing passado aos agentes de pesquisa
 ├── TOP100.md        # ranking por score composto
 ├── TOP25.md         # finalistas enxutos
-└── FINALISTAS.md    # análise profunda dos 25 (1610 linhas)
+├── FINALISTAS.md    # análise profunda dos 25 (1610 linhas)
+└── RELATORIO_TECNICO.md  # relatório de construção do catálogo (1190 linhas)
 
 scripts/             # pipeline de construção (reprodutibilidade)
 ├── consolidate.py   # merge + dedup dos JSONLs parciais
@@ -48,9 +50,10 @@ scripts/             # pipeline de construção (reprodutibilidade)
 ├── rank_top.py      # score composto + corte top 100 / 25
 ├── fetch_images.py  # downloader (Steam, itch, GitHub, Wikipedia, DDG)
 ├── fetch_images_fallback.py
-├── build_dashboard.py  # gera o HTML facetado
-├── build_pdfs.py    # gera os 3 PDFs magazine-style (WeasyPrint)
-└── magazine.css     # CSS print gamer
+├── build_dashboard.py   # gera o HTML facetado
+├── build_pdfs.py        # gera os 4 PDFs magazine-style (WeasyPrint)
+├── take_screenshots.py  # screenshots anotadas do dashboard via Playwright
+└── magazine.css         # CSS print gamer
 ```
 
 ## Como foi construído

@@ -532,3 +532,160 @@ h1.section {
 /* utility */
 .no-break { page-break-inside: avoid; }
 .new-page { page-break-before: always; }
+
+/* ============ RELATORIO body ============ */
+.report-body {
+  page-break-before: always;
+  string-set: section-title "RELATÓRIO TÉCNICO";
+  padding-top: 5mm;
+}
+.report-content {
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: #d4d8df;
+  column-count: 1;
+}
+.report-content > blockquote:first-of-type {
+  background: linear-gradient(135deg, rgba(255,159,67,0.08) 0%, rgba(0,212,255,0.05) 100%);
+  border-left: 4pt solid #ff9f43;
+  padding: 4mm 6mm;
+  margin: 0 0 10mm 0;
+  font-style: italic;
+  color: #e6e9ef;
+  font-size: 11pt;
+}
+.report-content h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 22pt;
+  font-weight: 900;
+  color: #ff9f43;
+  letter-spacing: -0.5pt;
+  margin: 12mm 0 4mm;
+  padding-bottom: 2mm;
+  border-bottom: 2pt solid #ff9f43;
+  page-break-before: always;
+  page-break-after: avoid;
+  string-set: section-title content();
+}
+.report-content h2:first-of-type { page-break-before: avoid; }
+.report-content h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 14pt;
+  font-weight: 700;
+  color: #00d4ff;
+  margin: 8mm 0 3mm;
+  letter-spacing: 0.2pt;
+  page-break-after: avoid;
+}
+.report-content h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5pt;
+  font-weight: 700;
+  color: #4ade80;
+  margin: 6mm 0 2mm;
+}
+.report-content p {
+  margin-bottom: 3mm;
+  text-align: justify;
+  hyphens: auto;
+}
+.report-content ul, .report-content ol {
+  margin: 2mm 0 4mm 6mm;
+}
+.report-content li {
+  margin-bottom: 1.5mm;
+}
+.report-content strong { color: #e6e9ef; font-weight: 700; }
+.report-content em { color: #ffd166; font-style: normal; font-weight: 600; }
+.report-content code {
+  font-family: 'JetBrains Mono', monospace;
+  background: #1c2130;
+  padding: 0.5mm 1.5mm;
+  border-radius: 1mm;
+  font-size: 9pt;
+  color: #ff9f43;
+}
+.report-content pre {
+  background: #151922;
+  border: 1pt solid #2a3142;
+  border-radius: 2mm;
+  padding: 4mm;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5pt;
+  color: #c7cbd3;
+  margin: 3mm 0;
+  page-break-inside: avoid;
+  white-space: pre-wrap;
+}
+.report-content pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+.report-content blockquote {
+  border-left: 3pt solid #00d4ff;
+  padding: 2mm 5mm;
+  margin: 3mm 0;
+  color: #a7aec0;
+  font-style: italic;
+  background: rgba(0,212,255,0.03);
+}
+.report-content a { color: #00d4ff; text-decoration: none; }
+
+.report-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4mm 0 6mm;
+  font-size: 9pt;
+  page-break-inside: avoid;
+}
+.report-content th {
+  background: #1c2130;
+  color: #ff9f43;
+  font-weight: 700;
+  text-align: left;
+  padding: 2mm 3mm;
+  border-bottom: 2pt solid #ff9f43;
+  font-size: 8.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+}
+.report-content td {
+  padding: 2mm 3mm;
+  border-bottom: 1px solid #2a3142;
+  vertical-align: top;
+}
+.report-content tr:nth-child(even) td {
+  background: rgba(28,33,48,0.4);
+}
+
+.report-content hr {
+  border: 0;
+  border-top: 1pt solid #2a3142;
+  margin: 8mm 0;
+}
+
+/* figuras (screenshots do dashboard) */
+.report-content img {
+  max-width: 100%;
+  border: 1pt solid #2a3142;
+  border-radius: 2mm;
+  margin: 3mm 0 2mm;
+  display: block;
+  page-break-before: avoid;
+  page-break-after: avoid;
+  page-break-inside: avoid;
+}
+.report-content p > img:only-child {
+  box-shadow: 0 4mm 12mm rgba(0,0,0,0.4);
+}
+/* parágrafo imediatamente após imagem — "Figura X —" */
+.report-content p > img + em,
+.report-content p > img ~ em {
+  display: block;
+  margin-top: 2mm;
+  color: #8b94a8;
+  font-size: 9pt;
+}

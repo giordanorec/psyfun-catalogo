@@ -21,6 +21,7 @@ from weasyprint import HTML, CSS
 ROOT = Path("/home/grec/Documentos/psyfun-jogos-research")
 SRC = ROOT / "exports" / "CONSOLIDADO.jsonl"
 FINAL_MD = ROOT / "exports" / "FINALISTAS.md"
+RELATORIO_MD = ROOT / "exports" / "RELATORIO_TECNICO.md"
 CSS_PATH = ROOT / "scripts" / "magazine.css"
 OUT_HTML = ROOT / "exports" / "print"
 OUT_PDF = ROOT / "exports" / "pdfs"
@@ -261,6 +262,32 @@ def build_finalistas(entries: list[dict]) -> Path:
     return emit_html(body, "FINALISTAS.html")
 
 
+def build_relatorio() -> Path:
+    """Constrói RELATORIO.html a partir do RELATORIO_TECNICO.md."""
+    md = RELATORIO_MD.read_text()
+    # Remove título principal h1 (usamos capa custom) - a 1ª linha "# ..."
+    md_body = re.sub(r"^#\s+[^\n]+\n", "", md, count=1)
+
+    body_html = markdown.markdown(
+        md_body,
+        extensions=["tables", "fenced_code", "toc", "attr_list"],
+    )
+
+    # Capa do relatório
+    cover = cover_html(
+        "RELATÓRIO TÉCNICO",
+        "Construção do catálogo PsyFun de jogos moddáveis — arquitetura, execução, resultados e próximos passos.",
+        "DOCUMENTAÇÃO",
+        1202,
+    )
+
+    body = [
+        cover,
+        f'<div class="report-body"><div class="report-content">{body_html}</div></div>',
+    ]
+    return emit_html(body, "RELATORIO.html")
+
+
 def emit_html(parts: list[str], filename: str) -> Path:
     doc = f"""<!doctype html>
 <html lang="pt-BR">
@@ -308,6 +335,10 @@ def main():
 
     print("\n=== FINALISTAS ===", file=sys.stderr)
     html = build_finalistas(entries)
+    render_pdf(html)
+
+    print("\n=== RELATORIO ===", file=sys.stderr)
+    html = build_relatorio()
     render_pdf(html)
 
     print("\nDone. Outputs:", file=sys.stderr)
