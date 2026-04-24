@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PsyFun Moddable Game Entry",
+  "type": "object",
+  "required": ["id", "nome", "status_codigo", "metodo_modificacao", "dificuldade", "aderencia_psyfun"],
+  "properties": {
+    "id": {"type": "string", "description": "slug kebab-case unique"},
+    "nome": {"type": "string"},
+    "ano_lancamento": {"type": ["integer", "null"]},
+    "dev_publisher": {"type": "string"},
+    "plataforma": {"type": "string", "description": "pipe-separated from vocab"},
+    "genero": {"type": "string"},
+    "engine_tech": {"type": "string"},
+    "status_codigo": {"type": "string", "enum": ["open-source", "source-available", "sdk-oficial", "modding-community", "creative-platform", "closed-only"]},
+    "metodo_modificacao": {"type": "string", "description": "one of the enum values in VOCABULARIO.md"},
+    "dificuldade": {"type": "integer", "minimum": 1, "maximum": 5},
+    "esforco_horas": {"type": "string", "enum": ["XS", "S", "M", "L", "XL"]},
+    "viabilidade_claude": {"type": "integer", "minimum": 1, "maximum": 5},
+    "raciocinio_dificuldade": {"type": "string"},
+    "dilemas_compativeis": {"type": "string", "description": "pipe-separated from PD|PG|SH|UG|DG|SD|TG|CG|CPG|BG"},
+    "aderencia_psyfun": {"type": "integer", "minimum": 1, "maximum": 5},
+    "exemplo_concreto": {"type": "string"},
+    "popularidade": {"type": "string"},
+    "idade_publico": {"type": "string"},
+    "requisitos_tecnicos": {"type": "string"},
+    "custo_licencas": {"type": "string"},
+    "risco_tos": {"type": "integer", "minimum": 1, "maximum": 5},
+    "links": {"type": "array", "items": {"type": "string"}},
+    "imagens": {"type": "array", "items": {"type": "string"}, "description": "deixar vazio nesta fase; só finalistas recebem imagens"},
+    "observacoes": {"type": "string"},
+    "fonte_agente": {"type": "string", "description": "slug do agente que incluiu"}
+  }
+}

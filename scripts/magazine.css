@@ -1,0 +1,534 @@
+/* ===================================================================
+   PsyFun Catalog — magazine-style print CSS (gamer edition)
+   ================================================================ */
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm 14mm;
+  background: #0b0d12;
+
+  @top-left {
+    content: "PsyFun · Catálogo de jogos moddáveis";
+    font-family: 'Inter', sans-serif;
+    font-size: 8pt;
+    color: #5a6478;
+    letter-spacing: 0.8pt;
+    text-transform: uppercase;
+  }
+  @top-right {
+    content: string(section-title);
+    font-family: 'Inter', sans-serif;
+    font-size: 8pt;
+    color: #ff9f43;
+    letter-spacing: 0.8pt;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: #8b94a8;
+  }
+  @bottom-left {
+    content: "psyfun-research · 2026";
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: #5a6478;
+  }
+}
+
+@page :first {
+  margin: 0;
+  background: #0b0d12;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+@page toc {
+  @top-right { content: "ÍNDICE"; }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #0b0d12;
+  color: #e6e9ef;
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  font-size: 10pt;
+  line-height: 1.45;
+}
+
+/* ============ COVER ============ */
+.cover {
+  page: first;
+  height: 297mm;
+  width: 210mm;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  background: linear-gradient(135deg, #0b0d12 0%, #1a1f2e 50%, #0b0d12 100%);
+  color: #fff;
+  overflow: hidden;
+  page-break-after: always;
+}
+.cover::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,159,67,.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(0,212,255,.12) 0%, transparent 40%);
+  z-index: 0;
+}
+.cover-content {
+  position: relative;
+  z-index: 2;
+  padding: 40mm 20mm;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cover-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9pt;
+  color: #ff9f43;
+  letter-spacing: 4pt;
+  text-transform: uppercase;
+  border-bottom: 2px solid #ff9f43;
+  padding-bottom: 6mm;
+  width: fit-content;
+}
+.cover-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 72pt;
+  line-height: 0.92;
+  letter-spacing: -2pt;
+  margin: 16mm 0 6mm;
+  background: linear-gradient(135deg, #ff9f43 0%, #ffd166 50%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.cover-sub {
+  font-size: 18pt;
+  color: #e6e9ef;
+  font-weight: 300;
+  max-width: 140mm;
+  margin-bottom: 12mm;
+  line-height: 1.3;
+}
+.cover-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10pt;
+  color: #8b94a8;
+  letter-spacing: 1pt;
+  border-top: 1px solid #2a3142;
+  padding-top: 6mm;
+}
+.cover-meta strong { color: #4ade80; }
+.cover-tag {
+  position: absolute;
+  top: 30mm;
+  right: 20mm;
+  background: #ff9f43;
+  color: #1a1000;
+  padding: 4mm 8mm;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 1.5pt;
+  text-transform: uppercase;
+  transform: rotate(6deg);
+  box-shadow: 0 4mm 8mm rgba(255,159,67,.3);
+}
+.cover-footer {
+  font-size: 9pt;
+  color: #5a6478;
+  letter-spacing: 1pt;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ============ TOC ============ */
+.toc {
+  page: toc;
+  padding: 5mm 0;
+  page-break-after: always;
+  string-set: section-title "ÍNDICE";
+}
+.toc h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 42pt;
+  font-weight: 900;
+  color: #ff9f43;
+  margin-bottom: 12mm;
+  letter-spacing: -1pt;
+  border-bottom: 4pt solid #ff9f43;
+  padding-bottom: 4mm;
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc li {
+  counter-increment: toc;
+  display: flex;
+  align-items: baseline;
+  padding: 3mm 0;
+  border-bottom: 1px dashed #2a3142;
+}
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14pt;
+  color: #4ade80;
+  font-weight: 700;
+  min-width: 16mm;
+}
+.toc li .nome {
+  flex: 1;
+  font-weight: 600;
+  font-size: 12pt;
+  color: #e6e9ef;
+}
+.toc li .score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10pt;
+  color: #ff9f43;
+  font-weight: 700;
+  padding: 1mm 4mm;
+  background: rgba(255,159,67,.15);
+  border-radius: 2mm;
+}
+
+/* ============ SECTION HEADERS ============ */
+h1.section {
+  font-family: 'Inter', sans-serif;
+  font-size: 36pt;
+  font-weight: 900;
+  color: #ff9f43;
+  letter-spacing: -1pt;
+  margin: 10mm 0 5mm;
+  page-break-after: avoid;
+}
+
+/* ============ GAME CARD (TOP100 densa: 2 per page) ============ */
+.game {
+  page-break-inside: avoid;
+  margin-bottom: 8mm;
+  padding: 0;
+  border-radius: 4mm;
+  background: linear-gradient(135deg, #151922 0%, #1c2130 100%);
+  border: 1px solid #2a3142;
+  overflow: hidden;
+  position: relative;
+  string-set: section-title attr(data-nome);
+}
+.game.big {
+  margin-bottom: 14mm;
+}
+
+.game-cover {
+  height: 55mm;
+  background: #0b0d12 center/cover no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+.game.big .game-cover { height: 90mm; }
+
+.game-cover::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 40%;
+  background: linear-gradient(to top, #151922 0%, transparent 100%);
+}
+
+.game-rank {
+  position: absolute;
+  top: 4mm;
+  left: 5mm;
+  font-family: 'Inter', sans-serif;
+  font-size: 36pt;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2mm 4mm rgba(0,0,0,.6);
+  line-height: 1;
+  z-index: 2;
+}
+.game.big .game-rank { font-size: 54pt; }
+
+.game-score {
+  position: absolute;
+  top: 5mm;
+  right: 5mm;
+  background: #ff9f43;
+  color: #1a1000;
+  padding: 2mm 4mm;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10pt;
+  font-weight: 700;
+  border-radius: 2mm;
+  z-index: 2;
+  box-shadow: 0 2mm 4mm rgba(0,0,0,.3);
+}
+
+.game-badges {
+  position: absolute;
+  bottom: 3mm;
+  left: 5mm;
+  display: flex;
+  gap: 2mm;
+  z-index: 2;
+  flex-wrap: wrap;
+  max-width: 80%;
+}
+.game-badge {
+  background: rgba(0,212,255,.9);
+  color: #001520;
+  padding: 1mm 3mm;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 0.5pt;
+  border-radius: 1mm;
+  text-transform: uppercase;
+}
+.game-badge.editor-pick {
+  background: #4ade80;
+  color: #0a200a;
+}
+.game-badge.premium {
+  background: #ff9f43;
+  color: #1a1000;
+}
+
+.game-body {
+  padding: 5mm 6mm;
+}
+.game-name {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 16pt;
+  color: #fff;
+  margin-bottom: 1mm;
+  letter-spacing: -0.3pt;
+  line-height: 1.15;
+}
+.game.big .game-name { font-size: 22pt; }
+
+.game-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8pt;
+  color: #8b94a8;
+  margin-bottom: 3mm;
+  letter-spacing: 0.3pt;
+}
+.game-meta strong { color: #00d4ff; }
+
+.game-stats {
+  display: flex;
+  gap: 5mm;
+  padding: 3mm 0;
+  border-top: 1px solid #2a3142;
+  border-bottom: 1px solid #2a3142;
+  margin-bottom: 3mm;
+}
+.stat {
+  flex: 1;
+  text-align: center;
+}
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7pt;
+  color: #5a6478;
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+  margin-bottom: 0.5mm;
+}
+.stat-val {
+  font-family: 'Inter', sans-serif;
+  font-size: 14pt;
+  font-weight: 900;
+  color: #e6e9ef;
+  line-height: 1;
+}
+.stat-val.aderencia { color: #4ade80; }
+.stat-val.dificuldade { color: #f87171; }
+.stat-val.viabilidade { color: #00d4ff; }
+.stat-val.esforco { color: #ff9f43; font-size: 12pt; }
+
+.game-dilemas {
+  display: flex;
+  gap: 1.5mm;
+  flex-wrap: wrap;
+  margin-bottom: 3mm;
+}
+.dilema {
+  background: rgba(96,165,250,.2);
+  color: #60a5fa;
+  padding: 1mm 2.5mm;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7pt;
+  font-weight: 700;
+  border-radius: 1mm;
+  border: 1px solid rgba(96,165,250,.3);
+}
+
+.game-example {
+  font-size: 9pt;
+  color: #c7cbd3;
+  line-height: 1.5;
+  padding: 3mm;
+  background: rgba(255,159,67,.08);
+  border-left: 2pt solid #ff9f43;
+  margin-bottom: 3mm;
+}
+.game-example::before {
+  content: "MOD CONCEPT ";
+  color: #ff9f43;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 7pt;
+  letter-spacing: 1pt;
+}
+
+.game-reasoning {
+  font-size: 9pt;
+  color: #8b94a8;
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 2mm;
+}
+
+.game-links {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5pt;
+  color: #5a6478;
+  letter-spacing: 0.3pt;
+  border-top: 1px dashed #2a3142;
+  padding-top: 2mm;
+}
+.game-links a { color: #00d4ff; text-decoration: none; margin-right: 3mm; }
+
+/* ============ FINALISTAS full-page layout ============ */
+.finalista {
+  page-break-before: always;
+  page-break-inside: avoid;
+  string-set: section-title attr(data-nome);
+}
+.finalista .hero {
+  height: 120mm;
+  background: #0b0d12 center/cover no-repeat;
+  position: relative;
+  margin: -5mm -14mm 10mm -14mm;
+  overflow: hidden;
+}
+.finalista .hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(11,13,18,.3) 0%,
+    rgba(11,13,18,.5) 40%,
+    rgba(11,13,18,.95) 95%,
+    #0b0d12 100%);
+}
+.finalista .hero-text {
+  position: absolute;
+  bottom: 8mm;
+  left: 14mm;
+  right: 14mm;
+  z-index: 2;
+}
+.finalista .rank-huge {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 120pt;
+  color: rgba(255,159,67,.25);
+  line-height: 1;
+  position: absolute;
+  top: 5mm;
+  right: 14mm;
+  z-index: 1;
+}
+.finalista .title-huge {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 44pt;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -1.5pt;
+  margin-bottom: 4mm;
+  text-shadow: 0 3mm 8mm rgba(0,0,0,.8);
+}
+.finalista .tagline {
+  font-size: 12pt;
+  color: #ff9f43;
+  font-weight: 600;
+  letter-spacing: 0.5pt;
+}
+
+.finalista .body {
+  font-size: 10pt;
+}
+.finalista h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 12pt;
+  font-weight: 900;
+  color: #ff9f43;
+  text-transform: uppercase;
+  letter-spacing: 1.5pt;
+  margin: 6mm 0 3mm;
+  border-left: 3pt solid #ff9f43;
+  padding-left: 3mm;
+}
+.finalista p { margin-bottom: 3mm; color: #c7cbd3; }
+.finalista ul, .finalista ol {
+  margin-left: 6mm;
+  margin-bottom: 3mm;
+}
+.finalista li { margin-bottom: 1.5mm; color: #c7cbd3; }
+.finalista strong { color: #00d4ff; font-weight: 700; }
+.finalista em { color: #4ade80; font-style: normal; font-weight: 600; }
+.finalista code {
+  font-family: 'JetBrains Mono', monospace;
+  background: #1c2130;
+  padding: 0.5mm 1.5mm;
+  border-radius: 1mm;
+  font-size: 8.5pt;
+  color: #ff9f43;
+}
+.finalista a { color: #00d4ff; }
+
+/* ============ closing pages ============ */
+.closing {
+  page-break-before: always;
+  padding: 10mm 0;
+  string-set: section-title "RECOMENDAÇÕES";
+}
+.closing h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 36pt;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ff9f43 0%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8mm;
+  letter-spacing: -1pt;
+}
+.closing p {
+  font-size: 11pt;
+  line-height: 1.6;
+  margin-bottom: 5mm;
+  color: #c7cbd3;
+}
+.closing strong { color: #ff9f43; font-weight: 700; }
+
+/* utility */
+.no-break { page-break-inside: avoid; }
+.new-page { page-break-before: always; }
