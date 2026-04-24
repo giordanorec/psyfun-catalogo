@@ -524,6 +524,33 @@ main { padding: 22px; overflow-y: auto; }
     <h3>Esforço estimado <i class="info-i" title="Horas humanas-equivalentes para primeiro piloto">i</i></h3>
     <div class="chips" id="chips-esforco"></div>
 
+    <h3>Gênero <i class="info-i" title="Tags de gênero típicas (action, RPG, strategy...) — múltiplos valores = OR">i</i></h3>
+    <div class="chips" id="chips-genero"></div>
+
+    <h3>Visualização <i class="info-i" title="2D, 3D, isométrico, pixel art, first-person, etc — múltiplos valores = OR">i</i></h3>
+    <div class="chips" id="chips-visualizacao"></div>
+
+    <h3>Modo de jogo <i class="info-i" title="Single-player, coop, PvP, multiplayer local ou online, MMO">i</i></h3>
+    <div class="chips" id="chips-modo"></div>
+
+    <h3>Ritmo <i class="info-i" title="Real-time, turn-based, async, tick-based — escolha um">i</i></h3>
+    <select id="sel-ritmo">
+      <option value="">— qualquer —</option>
+    </select>
+
+    <h3>Duração <i class="info-i" title="Session (partida rápida), campaign (narrativa), endless (mundo persistente / sandbox)">i</i></h3>
+    <select id="sel-duracao">
+      <option value="">— qualquer —</option>
+    </select>
+
+    <h3>Licença <i class="info-i" title="Tipo de licença/disponibilidade do código">i</i></h3>
+    <select id="sel-licenca">
+      <option value="">— qualquer —</option>
+    </select>
+
+    <h3>Tema <i class="info-i" title="Fantasy, sci-fi, militar, horror, etc — múltiplos valores = OR">i</i></h3>
+    <div class="chips" id="chips-tema"></div>
+
     <h3>Opções</h3>
     <label class="toggle" title="Esconde jogos sem capa baixada"><input type="checkbox" id="only-with-img">Apenas com imagem</label>
     <label class="toggle" title="Mostra apenas jogos com vídeo de gameplay coletado"><input type="checkbox" id="only-with-video">Apenas com vídeo</label>
@@ -737,6 +764,9 @@ const state = {
   q: '', dilemas: new Set(),
   minAderencia: 1, minViabilidade: 1, maxDificuldade: 5, maxRisco: 5,
   metodos: new Set(), statuses: new Set(), esforcos: new Set(),
+  generos: new Set(), visualizacoes: new Set(), modos: new Set(),
+  temas: new Set(),
+  ritmo: '', duracao: '', licenca: '',
   withImg: false, withVideo: false,
   // Rankings
   rankSub: 'single',
@@ -747,6 +777,20 @@ const state = {
 };
 
 // ==================== POPULAR CONTROLES ====================
+function multiValues(field) {
+  const s = new Set();
+  for (const e of DATA) {
+    const v = e[field];
+    if (!v) continue;
+    for (const x of String(v).split('|')) {
+      const t = x.trim();
+      if (t) s.add(t);
+    }
+  }
+  return [...s].sort();
+}
+function singleValues(field) { return uniq(DATA.map(e => e[field])); }
+
 function populateControls() {
   const cd = document.getElementById('chips-dilemas');
   const rcd = document.getElementById('r-chips-dilemas');
@@ -768,6 +812,37 @@ function populateControls() {
     const lbl = {XS:'XS · dia',S:'S · semana',M:'M · mês',L:'L · 3 meses',XL:'XL · +3m'}[x];
     ce.insertAdjacentHTML('beforeend', `<div class="chip" data-esf="${x}" title="${lbl}">${x}</div>`);
   }
+
+  // Novos filtros Steam-like
+  const cg = document.getElementById('chips-genero');
+  for (const g of multiValues('genero_tag')) {
+    cg.insertAdjacentHTML('beforeend', `<div class="chip" data-gen="${g}" title="${g}">${g.replace(/-/g,' ')}</div>`);
+  }
+  const cv = document.getElementById('chips-visualizacao');
+  for (const v of multiValues('visualizacao')) {
+    cv.insertAdjacentHTML('beforeend', `<div class="chip" data-vis="${v}" title="${v}">${v.replace(/-/g,' ')}</div>`);
+  }
+  const cmd = document.getElementById('chips-modo');
+  const MODE_LABEL = {single:'solo',coop:'coop','local-multi':'local multi','online-multi':'online multi',pvp:'PvP',mmo:'MMO'};
+  for (const m of multiValues('modo_jogo')) {
+    cmd.insertAdjacentHTML('beforeend', `<div class="chip" data-mod="${m}" title="${m}">${MODE_LABEL[m]||m}</div>`);
+  }
+  const ct = document.getElementById('chips-tema');
+  for (const t of multiValues('tema')) {
+    ct.insertAdjacentHTML('beforeend', `<div class="chip" data-tem="${t}" title="${t}">${t.replace(/-/g,' ')}</div>`);
+  }
+  const sr = document.getElementById('sel-ritmo');
+  for (const v of singleValues('ritmo')) if (v) sr.insertAdjacentHTML('beforeend', `<option value="${v}">${v.replace(/-/g,' ')}</option>`);
+  const sd = document.getElementById('sel-duracao');
+  for (const v of singleValues('duracao')) if (v) sd.insertAdjacentHTML('beforeend', `<option value="${v}">${v.replace(/-/g,' ')}</option>`);
+  const sl = document.getElementById('sel-licenca');
+  for (const v of singleValues('licenca')) if (v) sl.insertAdjacentHTML('beforeend', `<option value="${v}">${v.replace(/-/g,' ')}</option>`);
+}
+
+function multiMatch(entryField, set) {
+  if (set.size === 0) return true;
+  const vals = (entryField || '').split('|').map(x=>x.trim()).filter(Boolean);
+  return [...set].some(s => vals.includes(s));
 }
 
 // ==================== FILTRO / ORDENAÇÃO ====================
@@ -788,6 +863,13 @@ function matchesExplore(e) {
   if (state.metodos.size > 0 && !state.metodos.has(e.metodo_modificacao)) return false;
   if (state.statuses.size > 0 && !state.statuses.has(e.status_codigo)) return false;
   if (state.esforcos.size > 0 && !state.esforcos.has(e.esforco_horas)) return false;
+  if (!multiMatch(e.genero_tag, state.generos)) return false;
+  if (!multiMatch(e.visualizacao, state.visualizacoes)) return false;
+  if (!multiMatch(e.modo_jogo, state.modos)) return false;
+  if (!multiMatch(e.tema, state.temas)) return false;
+  if (state.ritmo && e.ritmo !== state.ritmo) return false;
+  if (state.duracao && e.duracao !== state.duracao) return false;
+  if (state.licenca && e.licenca !== state.licenca) return false;
   if (state.withImg && (!e.imagens || !e.imagens.length)) return false;
   if (state.withVideo && !e.video_youtube_id) return false;
   return true;
@@ -1076,6 +1158,26 @@ function bindExplore() {
   chipToggler('#chips-metodo .chip', state.metodos);
   chipToggler('#chips-status .chip', state.statuses);
   chipToggler('#chips-esforco .chip', state.esforcos);
+
+  // Novos filtros Steam-like
+  const toggleSet = (selector, set, attr) => {
+    document.querySelectorAll(selector).forEach(c => {
+      c.addEventListener('click', () => {
+        c.classList.toggle('active');
+        const v = c.dataset[attr];
+        set.has(v) ? set.delete(v) : set.add(v);
+        render();
+      });
+    });
+  };
+  toggleSet('#chips-genero .chip', state.generos, 'gen');
+  toggleSet('#chips-visualizacao .chip', state.visualizacoes, 'vis');
+  toggleSet('#chips-modo .chip', state.modos, 'mod');
+  toggleSet('#chips-tema .chip', state.temas, 'tem');
+
+  document.getElementById('sel-ritmo').addEventListener('change', e => { state.ritmo = e.target.value; render(); });
+  document.getElementById('sel-duracao').addEventListener('change', e => { state.duracao = e.target.value; render(); });
+  document.getElementById('sel-licenca').addEventListener('change', e => { state.licenca = e.target.value; render(); });
 }
 
 function bindRankings() {
