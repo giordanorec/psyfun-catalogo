@@ -154,11 +154,12 @@ def game_card(rank: int, e: dict, big: bool = False) -> str:
     <div class="game-name">{h(e['nome'])}</div>
     <div class="game-meta">{meta_line}</div>
     <div class="game-stats">
-      <div class="stat"><div class="stat-label">Aderência</div><div class="stat-val aderencia">{e.get('aderencia_psyfun','?')}</div></div>
-      <div class="stat"><div class="stat-label">Dificuldade</div><div class="stat-val dificuldade">{e.get('dificuldade','?')}</div></div>
-      <div class="stat"><div class="stat-label">Viabilidade</div><div class="stat-val viabilidade">{e.get('viabilidade_claude','?')}</div></div>
-      <div class="stat"><div class="stat-label">Esforço</div><div class="stat-val esforco">{h(e.get('esforco_horas','?'))}</div></div>
+      <div class="stat"><div class="stat-label">🧠 Ader</div><div class="stat-val aderencia">{e.get('aderencia_psyfun','?')}</div></div>
+      <div class="stat"><div class="stat-label">⚙️ Dif</div><div class="stat-val dificuldade">{e.get('dificuldade','?')}</div></div>
+      <div class="stat"><div class="stat-label">🤖 Viab</div><div class="stat-val viabilidade">{e.get('viabilidade_claude','?')}</div></div>
+      <div class="stat"><div class="stat-label">⏱️ Esf</div><div class="stat-val esforco">{h(e.get('esforco_horas','?'))}</div></div>
     </div>
+    <div class="game-meta" style="margin-top:2mm;text-align:center"><strong style="color:#ec4899">🎨 QUALIDADE:</strong> {'🎨' * (e.get('qualidade_producao') or 0)} <span style="color:#8b94a8">· {h(e.get('raciocinio_qualidade','-'))}</span></div>
     <div class="game-dilemas">{dilema_html}</div>
     <div class="game-example">{example}</div>
     { f'<div class="game-reasoning">{reasoning}</div>' if reasoning else ''}

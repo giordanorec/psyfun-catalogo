@@ -347,6 +347,8 @@ main { padding: 22px; overflow-y: auto; }
 .metric.pop .v { color: var(--gold); }
 .metric.tos { border-left: 2px solid var(--violet); }
 .metric.tos .v { color: var(--violet); }
+.metric.qual { border-left: 2px solid #ec4899; }
+.metric.qual .v { color: #ec4899; }
 
 .card .dilemas { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 2px; }
 .card .dilemas span {
@@ -550,6 +552,7 @@ main { padding: 22px; overflow-y: auto; }
         <option value="esforco">⏱️ Menor esforço</option>
         <option value="-risco_tos">⚖️ Menor risco ToS</option>
         <option value="popularidade">🔥 Popularidade</option>
+        <option value="qualidade_producao">🎨 Qualidade de produção</option>
       </select>
 
       <h3>Mostrar top</h3>
@@ -599,6 +602,11 @@ main { padding: 22px; overflow-y: auto; }
         <label>🔥 Popularidade</label>
         <input type="range" min="0" max="5" value="1" id="w-popularidade">
         <span class="wval" id="wval-popularidade">1</span>
+      </div>
+      <div class="weight-row" title="Peso da qualidade de produção — quanto assets/polish o jogo já entrega prontos">
+        <label>🎨 Qualidade</label>
+        <input type="range" min="0" max="5" value="2" id="w-qualidade">
+        <span class="wval" id="wval-qualidade">2</span>
       </div>
 
       <h3>Mostrar top</h3>
@@ -698,8 +706,14 @@ function shortDesc(e) {
 function metricsRow(e) {
   const pop = e.pop_score || 0;
   const popStars = pop >= 1 ? '⭐'.repeat(Math.round(pop)) : '';
+  const q = e.qualidade_producao || 0;
+  const qualStars = q >= 1 ? '🎨'.repeat(q) : '';
+  const qualLabel = e.raciocinio_qualidade || '';
   return `
-    <span class="metric ader" title="Aderência à mecânica PsyFun (1-5)">
+    <span class="metric qual" title="Qualidade de produção: ${escape(qualLabel)}">
+      <span class="ico">🎨</span><span class="v">${qualStars || '?'}</span>
+    </span>
+    <span class="metric ader" title="Aderência à mecânica PsyFun (1-5) — quão natural é enxertar coop/trair">
       <span class="ico">🧠</span><span class="v">${e.aderencia_psyfun||'?'}</span>
     </span>
     <span class="metric viab" title="Viabilidade Claude Code (1-5)">
@@ -728,7 +742,7 @@ const state = {
   rankSub: 'single',
   rankBy: 'score', rankN: 25,
   rDilemas: new Set(), rOnlyImg: false, rOnlyVideo: false,
-  weights: { aderencia: 3, viabilidade: 2, facilidade: 1, seguranca: 1, popularidade: 1 },
+  weights: { aderencia: 3, viabilidade: 2, facilidade: 1, seguranca: 1, popularidade: 1, qualidade: 2 },
   builderN: 25,
 };
 
@@ -798,6 +812,7 @@ function sortKey(e, by) {
     case 'esforco':           return (e.esforco_num || 3);
     case '-risco_tos':        return (e.risco_tos || 1);
     case 'popularidade':      return -(e.pop_score || 0);
+    case 'qualidade_producao':return -(e.qualidade_producao || 0);
   }
   return 0;
 }
@@ -808,7 +823,8 @@ function builderScore(e) {
        + (w.viabilidade * (e.viabilidade_claude || 0))
        + (w.facilidade * (6 - (e.dificuldade || 5)))
        + (w.seguranca * (6 - (e.risco_tos || 1)))
-       + (w.popularidade * (e.pop_score || 0));
+       + (w.popularidade * (e.pop_score || 0))
+       + (w.qualidade * (e.qualidade_producao || 0));
 }
 
 // ==================== RENDER ====================
@@ -833,7 +849,8 @@ function render() {
     const labels = {
       score:'score composto', aderencia_psyfun:'aderência PsyFun',
       viabilidade_claude:'viabilidade Claude', '-dificuldade':'menor dificuldade',
-      esforco:'menor esforço', '-risco_tos':'menor risco ToS', popularidade:'popularidade'
+      esforco:'menor esforço', '-risco_tos':'menor risco ToS',
+      popularidade:'popularidade', qualidade_producao:'qualidade de produção'
     };
     hint = `<span class="mode-badge">🏆 Top ${state.rankN}</span>ordenado por <strong>${labels[state.rankBy]}</strong>`;
   } else {
@@ -841,7 +858,7 @@ function render() {
     list.sort((a,b) => b._bscore - a._bscore);
     list = list.slice(0, state.builderN);
     const w = state.weights;
-    hint = `<span class="mode-badge">🏆 Builder · Top ${state.builderN}</span>pesos: 🧠${w.aderencia} · 🤖${w.viabilidade} · ⚙️${w.facilidade} · ⚖️${w.seguranca} · 🔥${w.popularidade}`;
+    hint = `<span class="mode-badge">🏆 Builder · Top ${state.builderN}</span>pesos: 🧠${w.aderencia} · 🤖${w.viabilidade} · ⚙️${w.facilidade} · ⚖️${w.seguranca} · 🔥${w.popularidade} · 🎨${w.qualidade}`;
   }
 
   document.getElementById('count-visible').textContent = list.length;
@@ -953,6 +970,7 @@ function renderModal(e) {
         <dt>⚙️ dificuldade</dt><dd>${e.dificuldade||'?'} / 5 — ${escape(e.raciocinio_dificuldade||'')}</dd>
         <dt>⏱️ esforço</dt><dd>${escape(e.esforco_horas||'?')}</dd>
         <dt>⚖️ risco ToS</dt><dd>${e.risco_tos||'?'} / 5</dd>
+        <dt>🎨 qualidade</dt><dd>${e.qualidade_producao ? '🎨'.repeat(e.qualidade_producao) + ' · ' : ''}${escape(e.raciocinio_qualidade||'-')}</dd>
         <dt>🔥 popularidade</dt><dd>${e.pop_score >= 1 ? '⭐'.repeat(Math.round(e.pop_score)) + ' · ' : ''}${escape(e.popularidade||'-')}</dd>
         <dt>dilemas</dt><dd>${dils.map(d=>`<span style="background:var(--bg-elev);padding:3px 8px;margin-right:5px;border-radius:4px;font-size:12px" title="${DILEMA_DESCR[d]||''}">${d} — ${DILEMA_NAMES[d]||''}</span>`).join('')}</dd>
         <dt>exemplo concreto</dt><dd>${escape(e.exemplo_concreto||'-')}</dd>
@@ -1087,6 +1105,7 @@ function bindRankings() {
   wq('w-facilidade','facilidade');
   wq('w-seguranca','seguranca');
   wq('w-popularidade','popularidade');
+  wq('w-qualidade','qualidade');
   document.getElementById('builder-n').addEventListener('change', e => { state.builderN = parseInt(e.target.value); render(); });
 }
 
