@@ -328,17 +328,18 @@ function rankedHTML(e, idx) {
 // Counters / summary bar
 // ============================================================
 function updateCounters(visible) {
-  document.getElementById('counterFiltered').textContent = visible.toLocaleString('pt-BR');
-  document.getElementById('counterTotal').textContent = TOTAL.toLocaleString('pt-BR');
-  document.getElementById('heroCounterPill').innerHTML =
-    `${visible.toLocaleString('pt-BR')} após filtros<em>· ${Math.round(visible / TOTAL * 100)}%</em>`;
+  const v = visible.toLocaleString('pt-BR');
+  const t = TOTAL.toLocaleString('pt-BR');
+  document.getElementById('counterFiltered').textContent = v;
+  document.getElementById('counterTotal').textContent = t;
   document.getElementById('catalogHeading').innerHTML =
-    `<span class="n">${visible.toLocaleString('pt-BR')}</span> jogos`;
+    `<span class="n">${v}</span> jogo${visible === 1 ? '' : 's'}`;
 }
 
 function updateSummaryBar(visible) {
   const parts = [];
-  parts.push(`<strong>${visible.toLocaleString('pt-BR')} resultados</strong>`);
+  const pct = Math.round(visible / TOTAL * 100);
+  parts.push(`<strong>${visible.toLocaleString('pt-BR')}</strong><span style="margin-left:6px;color:var(--fg-subtle)">/ ${TOTAL.toLocaleString('pt-BR')} · ${pct}%</span>`);
   if (state.dilemas.size) parts.push(`<span>${[...state.dilemas].join(' + ')} ativos</span>`);
   if (state.minAderencia > 1)   parts.push(`<span>Aderência ≥ ${state.minAderencia}</span>`);
   if (state.minViabilidade > 1) parts.push(`<span>Viabilidade ≥ ${state.minViabilidade}</span>`);
@@ -349,10 +350,13 @@ function updateSummaryBar(visible) {
   if (state.q)                  parts.push(`<span>Busca: "${escape(state.q)}"</span>`);
   if (state.withImg)            parts.push(`<span>Com imagem</span>`);
   if (state.withVideo)          parts.push(`<span>Com vídeo</span>`);
+  const hasFilters = parts.length > 1;
   const inner = parts.join('<span class="sep">·</span>');
   document.getElementById('summaryBar').innerHTML =
-    `${inner}<button class="clear" type="button" id="clearAllBtn"><span class="x"></span>Limpar tudo</button>`;
-  document.getElementById('clearAllBtn').addEventListener('click', clearAllFilters);
+    `${inner}${hasFilters ? `<button class="clear" type="button" id="clearAllBtn"><span class="x"></span>Limpar tudo</button>` : ''}`;
+  if (hasFilters) {
+    document.getElementById('clearAllBtn').addEventListener('click', clearAllFilters);
+  }
 }
 
 function clearAllFilters() {

@@ -1,45 +1,25 @@
 #!/usr/bin/env python3
-"""Build public/index.html (v4 dashboard) — chassis HTML + estilos do handoff
-v4-20260424-2002 + dataset CONSOLIDADO.jsonl embeded + scripts/v4-app.js.
+"""Build public/index.html (dashboard PsyFun v4.1) — chassis HTML enxuto +
+CSS local (scripts/v4-styles.css) + dataset CONSOLIDADO.jsonl embedded
++ scripts/v4-app.js.
 
 Roda: python scripts/build_v4.py
+
+A revisão pós-feedback (v4.1) descartou o hero monumental editorial e a
+serif display gigante. Resultado: cards são protagonistas, tipografia
+comedida estilo plataforma de games (Steam/itch.io).
 """
 from __future__ import annotations
 
 import json
-import re
 import sys
-import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-HANDOFF_DIR = ROOT / "handoff"
 DATA = ROOT / "public" / "data" / "CONSOLIDADO.jsonl"
 APP_JS = ROOT / "scripts" / "v4-app.js"
+CSS = ROOT / "scripts" / "v4-styles.css"
 OUT = ROOT / "public" / "index.html"
-HIFI_FILENAME = "psyfun-v4-hifi.html"  # arquivo dentro do zip
-
-
-def find_handoff_zip() -> Path:
-    """Pega o zip mais recente em handoff/v4-*.zip."""
-    zips = sorted(HANDOFF_DIR.glob("v4-*.zip"))
-    if not zips:
-        sys.exit(f"ERRO: nenhum bundle em {HANDOFF_DIR}/v4-*.zip")
-    return zips[-1]
-
-
-def read_hifi_from_zip(zip_path: Path) -> str:
-    with zipfile.ZipFile(zip_path) as zf:
-        with zf.open(HIFI_FILENAME) as fh:
-            return fh.read().decode("utf-8")
-
-
-def extract_styles(hifi_text: str) -> str:
-    """Captura todo bloco entre <style> e </style> do hifi."""
-    m = re.search(r"<style>(.*?)</style>", hifi_text, re.DOTALL)
-    if not m:
-        sys.exit("ERRO: bloco <style> não encontrado no hifi")
-    return m.group(1)
 
 
 def load_data(path: Path) -> list[dict]:
@@ -73,46 +53,9 @@ def build_html(styles: str, data: list[dict], app_js: str) -> str:
 <meta name="description" content="Catálogo curado de {len(data)} jogos moddáveis pra pesquisa em dilemas sociais. PsyFun Lab · CIn/UFPE × LDAPP/UNIVASF.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<style>{styles}
-/* ============================================================
-   Adições v4 (popovers de select + scrollbar + utilidades)
-   ============================================================ */
-.select{{position:relative}}
-.select-pop{{
-  position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;
-  margin:0;padding:6px;list-style:none;
-  background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-sm);
-  box-shadow:var(--shadow-pop);
-  max-height:240px;overflow:auto;
-  display:none;
-  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
-}}
-.select-pop.open{{display:block}}
-.select-pop li{{
-  padding:8px 12px;font-size:12px;color:var(--fg-muted);
-  border-radius:var(--radius-sm);cursor:pointer;
-  transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);
-}}
-.select-pop li:hover{{background:var(--accent-soft);color:var(--fg)}}
-
-.muted-tag{{
-  font-size:18px;color:var(--fg-subtle);
-  font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;
-  font-weight:400;margin-left:12px;
-}}
-
-main.main{{ scrollbar-width:thin; scrollbar-color:var(--border) transparent }}
-
-/* mobile: backdrop quando sidebar aberta */
-@media (max-width:900px){{
-  .sidebar[data-open="true"]::before{{
-    content:"";position:fixed;inset:0 0 0 88vw;
-    background:hsl(240 13% 7% / .6);backdrop-filter:blur(2px);
-  }}
-}}
-</style>
+<style>{styles}</style>
 </head>
 <body>
 
@@ -123,7 +66,7 @@ main.main{{ scrollbar-width:thin; scrollbar-color:var(--border) transparent }}
   <button class="mobile-menu" aria-label="Abrir filtros" id="mobileMenuBtn">
     <span class="lines"><span></span><span></span><span></span></span>
   </button>
-  <a class="brand" href="#" style="display:flex;align-items:baseline;gap:10px">
+  <a class="brand" href="#">
     <span class="brand-mark">PsyFun</span>
     <span class="brand-tag">v4 · catálogo</span>
   </a>
@@ -263,26 +206,8 @@ main.main{{ scrollbar-width:thin; scrollbar-color:var(--border) transparent }}
 
   <main class="main">
 
-    <section class="hero">
-      <p class="kicker">
-        <span class="pulse"></span>Catálogo<span class="sep">·</span>Explorar<span class="sep">·</span>Abril 2026
-      </p>
-      <h1 class="hero-counter">
-        <span class="num">{n_total}</span>
-        <span class="filter-pill" id="heroCounterPill">{n_total} indexados<em>· 100%</em></span>
-      </h1>
-      <p class="hero-h1">
-        Catálogo indexado de jogos moddáveis para pesquisa empírica em <em>dilemas sociais</em> — do <span class="em-line">Prisoner&rsquo;s Dilemma</span> ao <span class="em-line">Commons</span>, <em>10 paradigmas</em> cobertos.
-      </p>
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="n">{n_total}<span class="unit">jogos</span></div><div class="l">indexados</div></div>
-        <div class="hero-stat"><div class="n">10<span class="unit">paradigmas</span></div><div class="l">dilemas cobertos</div></div>
-        <div class="hero-stat"><div class="n">5.0<span class="unit">/ 5</span></div><div class="l">score máximo</div></div>
-        <div class="hero-stat"><div class="n">UFPE<span class="unit">2026</span></div><div class="l">curadoria psyfun lab</div></div>
-      </div>
-    </section>
-
-    <div class="summary-bar" id="summaryBar"></div>
+    <!-- status bar enxuta no topo (substitui o hero) -->
+    <div class="status-bar" id="summaryBar"></div>
 
     <section class="catalog">
       <div class="catalog-head">
@@ -311,7 +236,7 @@ main.main{{ scrollbar-width:thin; scrollbar-color:var(--border) transparent }}
     <p class="breadcrumb">
       <b>Rankings</b><span class="sep">·</span><span id="rkBread1">Categoria</span><span class="sep">·</span><span id="rkBread2">Aderência ↓</span><span class="sep">·</span><span id="rkBread3">Top 25</span>
     </p>
-    <h1 class="rankings-h1">Quais jogos <em>melhor servem</em> à sua pesquisa?</h1>
+    <h1 class="rankings-h1">Top jogos do catálogo, ordenados por <em>dimensão escolhida</em>.</h1>
     <div class="rankings-controls">
       <div class="segmented" role="tablist">
         <button role="tab" aria-current="true"  data-rktab="categoria">Categoria</button>
@@ -372,7 +297,7 @@ main.main{{ scrollbar-width:thin; scrollbar-color:var(--border) transparent }}
         </div>
       </aside>
       <div class="builder-results">
-        <div class="catalog-head" style="margin-bottom:24px">
+        <div class="catalog-head" style="margin-bottom:18px">
           <h2 id="builderHeading"><span class="n">25</span> resultados <span class="muted-tag">peso custom</span></h2>
         </div>
         <div class="ranked-list" id="builderList" style="padding:0"></div>
@@ -385,19 +310,19 @@ main.main{{ scrollbar-width:thin; scrollbar-color:var(--border) transparent }}
      Panel: Sobre
      ============================================================ -->
 <section class="panel" data-panel="sobre">
-  <div class="rankings-head">
+  <div class="sobre">
     <p class="breadcrumb"><b>Sobre</b><span class="sep">·</span>Metodologia</p>
-    <h1 class="rankings-h1">PsyFun v4 indexa jogos moddáveis pelo <em>fit empírico</em> com paradigmas de dilemas sociais.</h1>
-    <p style="max-width:720px;font-size:16px;line-height:1.6;color:var(--fg-muted)">
+    <h1>PsyFun v4 indexa jogos moddáveis pelo <em>fit empírico</em> com paradigmas de dilemas sociais.</h1>
+    <p>
       Curadoria do <strong style="color:var(--fg)">PsyFun Lab</strong> — CIn/UFPE × LDAPP/UNIVASF · 2026.
-      Cada um dos {len(data)} jogos é avaliado em 8 dimensões (qualidade · aderência · viabilidade · dificuldade · esforço · ToS · popularidade · score composto)
+      Cada um dos {n_total} jogos é avaliado em 8 dimensões (qualidade · aderência · viabilidade · dificuldade · esforço · ToS · popularidade · score composto)
       por revisores treinados, com checagem cruzada via Claude Code para reprodutibilidade.
     </p>
-    <p style="max-width:720px;font-size:14px;line-height:1.7;color:var(--fg-subtle);font-family:var(--font-mono);margin-top:24px">
-      <strong style="color:var(--fg-muted)">vocabulário controlado:</strong> <a href="https://github.com/giordanorec/psyfun-catalogo/blob/main/meta/VOCABULARIO.md" target="_blank" rel="noopener" style="color:var(--accent)">meta/VOCABULARIO.md</a><br>
-      <strong style="color:var(--fg-muted)">repo:</strong> <a href="https://github.com/giordanorec/psyfun-catalogo" target="_blank" rel="noopener" style="color:var(--accent)">github.com/giordanorec/psyfun-catalogo</a><br>
-      <strong style="color:var(--fg-muted)">contato:</strong> <a href="mailto:grec@cin.ufpe.br" style="color:var(--accent)">grec@cin.ufpe.br</a>
-    </p>
+    <div class="meta-block">
+      <strong>vocabulário controlado:</strong> <a href="https://github.com/giordanorec/psyfun-catalogo/blob/main/meta/VOCABULARIO.md" target="_blank" rel="noopener">meta/VOCABULARIO.md</a><br>
+      <strong>repo:</strong> <a href="https://github.com/giordanorec/psyfun-catalogo" target="_blank" rel="noopener">github.com/giordanorec/psyfun-catalogo</a><br>
+      <strong>contato:</strong> <a href="mailto:grec@cin.ufpe.br">grec@cin.ufpe.br</a>
+    </div>
   </div>
 </section>
 
@@ -480,28 +405,28 @@ main.main{{ scrollbar-width:thin; scrollbar-color:var(--border) transparent }}
 
 
 def main() -> None:
-    zip_path = find_handoff_zip()
     if not DATA.exists():
         sys.exit(f"ERRO: {DATA} não encontrado.")
     if not APP_JS.exists():
         sys.exit(f"ERRO: {APP_JS} não encontrado.")
+    if not CSS.exists():
+        sys.exit(f"ERRO: {CSS} não encontrado.")
 
-    print(f"→ lendo hifi: {zip_path.name} → {HIFI_FILENAME}")
-    hifi_text = read_hifi_from_zip(zip_path)
-    styles = extract_styles(hifi_text)
+    print(f"→ lendo CSS local: {CSS.relative_to(ROOT)}")
+    styles = CSS.read_text(encoding="utf-8")
     print(f"  CSS: {len(styles):,} chars")
 
-    print(f"→ lendo dataset: {DATA}")
+    print(f"→ lendo dataset: {DATA.relative_to(ROOT)}")
     data = load_data(DATA)
     print(f"  jogos: {fmt_br(len(data))}")
 
-    print(f"→ lendo app js: {APP_JS}")
+    print(f"→ lendo app js: {APP_JS.relative_to(ROOT)}")
     app_js = APP_JS.read_text(encoding="utf-8")
     print(f"  JS: {len(app_js):,} chars")
 
     html = build_html(styles, data, app_js)
     OUT.write_text(html, encoding="utf-8")
-    print(f"→ escrito: {OUT}  ({len(html):,} bytes)")
+    print(f"→ escrito: {OUT.relative_to(ROOT)}  ({len(html):,} bytes)")
 
 
 if __name__ == "__main__":
