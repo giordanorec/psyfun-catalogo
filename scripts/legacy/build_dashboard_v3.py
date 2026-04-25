@@ -1,3 +1,5 @@
+# LEGACY (v3) — substituído por scripts/build_v4.py em 2026-04-24.
+# Mantido pra referência. NÃO RODAR — sobrescreve public/index.html com v3.
 #!/usr/bin/env python3
 """
 Gera exports/dashboard.html — v3: duas abas (Explorar / Rankings),

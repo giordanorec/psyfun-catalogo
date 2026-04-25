@@ -50,11 +50,23 @@ scripts/             # pipeline de construção (reprodutibilidade)
 ├── rank_top.py      # score composto + corte top 100 / 25
 ├── fetch_images.py  # downloader (Steam, itch, GitHub, Wikipedia, DDG)
 ├── fetch_images_fallback.py
-├── build_dashboard.py   # gera o HTML facetado
+├── build_v4.py      # gera public/index.html (dashboard v4 — atual)
+├── v4-app.js        # lógica JS do dashboard v4 (vanilla)
+├── legacy/build_dashboard_v3.py  # v3 arquivado — não rodar
 ├── build_pdfs.py        # gera os 4 PDFs magazine-style (WeasyPrint)
 ├── take_screenshots.py  # screenshots anotadas do dashboard via Playwright
 └── magazine.css         # CSS print gamer
 ```
+
+### Regerar o dashboard
+
+```bash
+python scripts/build_v4.py
+```
+
+Lê `public/data/CONSOLIDADO.jsonl` + chassis em `handoff/v4-*/` + lógica em
+`scripts/v4-app.js`, escreve `public/index.html`. Vercel serve direto de
+`public/`.
 
 ## Como foi construído
 
